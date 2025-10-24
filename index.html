@@ -1,81 +1,129 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Ernesto’s Bazar Apartados</title>
-  <link rel="manifest" href="/manifest.json" />
-  <meta name="theme-color" content="#A58FC0" />
-  <link rel="stylesheet" href="/styles.css" />
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🛍️ Ernesto’s Bazar Apartados 💜</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #1a001f;
+      color: #f5f2f7;
+      margin: 0;
+      padding: 0;
+    }
+    header {
+      background-color: #4a006e;
+      text-align: center;
+      padding: 1rem;
+      font-size: 1.6rem;
+      font-weight: bold;
+      color: #fff;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+    }
+    main {
+      padding: 1rem;
+    }
+    input, select, button {
+      display: block;
+      width: 100%;
+      padding: 0.6rem;
+      margin-top: 0.5rem;
+      border-radius: 10px;
+      border: none;
+    }
+    button {
+      background-color: #b266ff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    button:hover {
+      background-color: #9933ff;
+    }
+    .card {
+      background: #2a0035;
+      padding: 1rem;
+      border-radius: 15px;
+      margin-top: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    }
+    footer {
+      text-align: center;
+      padding: 1rem;
+      font-size: 0.9rem;
+      color: #aaa;
+    }
+  </style>
 </head>
 <body>
-  <header class="topbar">
-    <h1>Ernesto’s Bazar Apartados</h1>
-    <div>
-      <button id="installBtn" class="btn small">Instalar</button>
-      <button id="viewExpired" class="btn small">Vencidos</button>
+  <header>🛍️ Ernesto’s Bazar Apartados 💜</header>
+  <main>
+    <div class="card">
+      <h3>Nuevo Apartado</h3>
+      <input type="text" id="nombre" placeholder="Nombre del cliente" />
+      <input type="text" id="producto" placeholder="Producto" />
+      <input type="number" id="precio" placeholder="Precio total" />
+      <input type="number" id="anticipo" placeholder="Anticipo (editable)" />
+      <button onclick="registrarApartado()">Registrar</button>
     </div>
-  </header>
-
-  <main class="container">
-    <section class="card form-card">
-      <h2>Nuevo apartado</h2>
-      <div class="grid">
-        <label>Nombre<input id="name" /></label>
-        <label>ID de venta<input id="saleId" placeholder="opcional" /></label>
-        <label>Teléfono<input id="phone" inputmode="tel" /></label>
-        <label>Producto<input id="product" /></label>
-        <label>Costo<input id="cost" inputmode="decimal" /></label>
-        <label>Anticipo (30%)<input id="deposit" readonly /></label>
-        <label>Duración
-          <select id="duration">
-            <option value="15">15 días (apartado)</option>
-            <option value="30">30 días (en mueble)</option>
-          </select>
-        </label>
-        <label>Lugar<input id="location" placeholder="ej. almacén, mueble A" /></label>
-        <label>Número de caja<input id="box" /></label>
-        <label>Color bolsa<input id="bagColor" /></label>
-      </div>
-      <div class="actions">
-        <button id="createBtn" class="btn primary">Crear Apartado</button>
-        <button id="clearForm" class="btn">Limpiar</button>
-      </div>
-    </section>
-
-    <section class="card list-card">
-      <h2>Buscar / Apartados</h2>
-      <input id="search" placeholder="Buscar por nombre, venta, teléfono, ubicación, caja, color..." />
-      <div id="list"></div>
-    </section>
+    <div id="apartados"></div>
   </main>
+  <footer>📞 Contacto: 6221110081</footer>
+  <script>
+    let apartados = JSON.parse(localStorage.getItem('apartados') || '[]');
 
-  <footer class="footer">
-    <small>Nota: Apartados normales 15 días; en mueble 30 días. Ticket enviado por SMS o WhatsApp. Contacto: 622 111 0081</small>
-  </footer>
+    function mostrarApartados() {
+      const cont = document.getElementById('apartados');
+      cont.innerHTML = '<h3>Lista de Apartados</h3>';
+      apartados.forEach((a, i) => {
+        const restante = a.precio - (a.anticipo + (a.abonos?.reduce((t,ab)=>t+ab.monto,0)||0));
+        cont.innerHTML += `
+          <div class="card">
+            <b>${a.nombre}</b> - ${a.producto}<br>
+            Precio: $${a.precio} | Anticipo: $${a.anticipo}<br>
+            Restante: $${restante.toFixed(2)}<br>
+            Estado: ${a.estado}<br>
+            <button onclick="abonar(${i})">Agregar Abono</button>
+            <button onclick="cancelar(${i})">Cancelar</button>
+          </div>`;
+      });
+    }
 
-  <template id="itemTpl">
-    <div class="item">
-      <div class="item-left">
-        <div class="item-title"></div>
-        <div class="item-sub"></div>
-      </div>
-      <div class="item-right">
-        <div class="item-amount"></div>
-        <div class="item-actions">
-          <button class="btn xsmall edit">Editar</button>
-          <button class="btn xsmall pay">Abono</button>
-          <button class="btn xsmall ticket">Ticket</button>
-          <button class="btn xsmall sms">SMS</button>
-          <button class="btn xsmall wa">WhatsApp</button>
-          <button class="btn xsmall cancel">Cancelar</button>
-        </div>
-      </div>
-    </div>
-  </template>
+    function registrarApartado() {
+      const nombre = document.getElementById('nombre').value;
+      const producto = document.getElementById('producto').value;
+      const precio = parseFloat(document.getElementById('precio').value);
+      const anticipo = parseFloat(document.getElementById('anticipo').value || precio*0.3);
+      const nuevo = {
+        nombre, producto, precio, anticipo,
+        fecha: new Date().toLocaleDateString(),
+        abonos: [], estado: 'vigente'
+      };
+      apartados.push(nuevo);
+      localStorage.setItem('apartados', JSON.stringify(apartados));
+      mostrarApartados();
+      alert("Apartado registrado ✅");
+    }
 
-<script src="/db.js"></script>
-<script src="/app.js"></script>
+    function abonar(i) {
+      const monto = parseFloat(prompt("Monto del abono:"));
+      if (!monto) return;
+      const fecha = new Date().toLocaleDateString();
+      apartados[i].abonos.push({ monto, fecha });
+      localStorage.setItem('apartados', JSON.stringify(apartados));
+      mostrarApartados();
+    }
+
+    function cancelar(i) {
+      apartados[i].estado = 'cancelado';
+      localStorage.setItem('apartados', JSON.stringify(apartados));
+      mostrarApartados();
+    }
+
+    mostrarApartados();
+  </script>
 </body>
 </html>
