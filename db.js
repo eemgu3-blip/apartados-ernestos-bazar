@@ -1,0 +1,9 @@
+// IndexedDB helper
+const DB_NAME = 'ernestos_apartados_db';
+const DB_VERSION = 1;
+const STORE_NAME = 'apartados';
+function openDb(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=(e)=>{const db=e.target.result;if(!db.objectStoreNames.contains(STORE_NAME)){const store=db.createObjectStore(STORE_NAME,{keyPath:'id'});store.createIndex('by_status','status',{unique:false});store.createIndex('by_due','dueDate',{unique:false});}};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+async function dbAdd(item){const db=await openDb();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,'readwrite');const store=tx.objectStore(STORE_NAME);const r=store.add(item);r.onsuccess=()=>resolve(item);r.onerror=()=>reject(r.error);});}
+async function dbPut(item){const db=await openDb();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,'readwrite');const store=tx.objectStore(STORE_NAME);const r=store.put(item);r.onsuccess=()=>resolve(item);r.onerror=()=>reject(r.error);});}
+async function dbDelete(id){const db=await openDb();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,'readwrite');const store=tx.objectStore(STORE_NAME);const r=store.delete(id);r.onsuccess=()=>resolve();r.onerror=()=>reject(r.error);});}
+async function dbGetAll(){const db=await openDb();return new Promise((resolve,reject)=>{const tx=db.transaction(STORE_NAME,'readonly');const store=tx.objectStore(STORE_NAME);const r=store.getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error);});}

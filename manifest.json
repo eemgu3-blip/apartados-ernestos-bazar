@@ -3,8 +3,8 @@
   "name": "Ernesto’s Bazar Apartados",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#F7FAFC",
-  "theme_color": "#7C6B9A",
+  "background_color": "#FBFAF8",
+  "theme_color": "#A58FC0",
   "icons": [
     {
       "src": "/icons/icon.svg",
