@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ernesto’s Bazar Apartados</title>
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#7C6B9A" />
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <h1>Ernesto’s Bazar Apartados</h1>
+    <button id="installBtn" class="btn small">Instalar</button>
+  </header>
+
+  <main class="container">
+    <section class="card form-card">
+      <h2>Nuevo apartado</h2>
+      <div class="grid">
+        <label>Nombre<input id="name" /></label>
+        <label>ID de venta<input id="saleId" placeholder="opcional" /></label>
+        <label>Teléfono<input id="phone" inputmode="tel" /></label>
+        <label>Producto<input id="product" /></label>
+        <label>Costo<input id="cost" inputmode="decimal" /></label>
+        <label>Anticipo<input id="deposit" inputmode="decimal" value="0" /></label>
+        <label>Duración
+          <select id="duration">
+            <option value="15">15 días (apartado)</option>
+            <option value="30">30 días (en mueble)</option>
+          </select>
+        </label>
+        <label>Lugar<input id="location" placeholder="ej. almacén, mueble A" /></label>
+        <label>Número de caja<input id="box" /></label>
+        <label>Color bolsa<input id="bagColor" /></label>
+      </div>
+      <div class="actions">
+        <button id="createBtn" class="btn primary">Crear Apartado</button>
+        <button id="clearForm" class="btn">Limpiar</button>
+      </div>
+    </section>
+
+    <section class="card list-card">
+      <h2>Buscar / Apartados</h2>
+      <input id="search" placeholder="Buscar por nombre, venta, teléfono, ubicación, caja, color..." />
+      <div id="list"></div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <small>Nota: Apartados normales 15 días; en mueble 30 días. Ticket enviado por SMS o WhatsApp.</small>
+  </footer>
+
+  <template id="itemTpl">
+    <div class="item">
+      <div class="item-left">
+        <div class="item-title"></div>
+        <div class="item-sub"></div>
+      </div>
+      <div class="item-right">
+        <div class="item-amount"></div>
+        <div class="item-actions">
+          <button class="btn xsmall edit">Editar</button>
+          <button class="btn xsmall pay">Abono</button>
+          <button class="btn xsmall ticket">Ticket</button>
+          <button class="btn xsmall sms">SMS</button>
+          <button class="btn xsmall wa">WhatsApp</button>
+          <button class="btn xsmall cancel">Cancelar</button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+<script type="module" src="/app.js"></script>
+</body>
+</html>
